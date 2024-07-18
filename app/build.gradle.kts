@@ -13,11 +13,11 @@ fun getLocalProperty(key: String): String {
 }
 
 android {
-    namespace = "dev.borisochieng.timbushop"
+    namespace = "dev.borisochieng.malltiverse"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "dev.borisochieng.timbushop"
+        applicationId = "dev.borisochieng.malltiverse"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

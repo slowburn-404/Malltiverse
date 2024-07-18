@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TimbuShop"
+rootProject.name = "Malltiverse"
 include(":app")
  

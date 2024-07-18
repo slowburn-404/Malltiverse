@@ -12,8 +12,8 @@ A simple Android application that consumes the [Timbu API](https://docs.timbu.cl
 - List products by category.
 
 ## Architecture Overview
-- The application utilizes the Model-View-ViewModel (MVVM) architecture pattern. The Model ([Data layer](app/src/main/java/dev/borisochieng/timbushop/data/)) is responsible for data retrieval from the API and uses the repository pattern.
-- The [UI layer](app/src/main/java/dev/borisochieng/timbushop/ui/) wraps the View, which consists of [Activities](https://developer.android.com/guide/components/activities/intro-activities) made up of UI elements called Composables, and the ViewModel, holds the state for the screen (View) and data retrieved from the Model.
+- The application utilizes the Model-View-ViewModel (MVVM) architecture pattern. The Model ([Data layer](app/src/main/java/dev/borisochieng/malltiverse/data/)) is responsible for data retrieval from the API and uses the repository pattern.
+- The [UI layer](app/src/main/java/dev/borisochieng/malltiverse/ui/) wraps the View, which consists of [Activities](https://developer.android.com/guide/components/activities/intro-activities) made up of UI elements called Composables, and the ViewModel, holds the state for the screen (View) and data retrieved from the Model.
 
 ![MVVM Architecture](screenshots/mvvm.webp)
 
