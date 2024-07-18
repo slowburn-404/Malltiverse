@@ -57,8 +57,7 @@ fun CartItem(
         modifier = modifier
             .height(150.dp)
             .padding(8.dp)
-            .fillMaxWidth()
-            .background(Color.Transparent),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(Color.Transparent),
         shape = shape.container,
         border = BorderStroke(2.dp, Color.LightGray)

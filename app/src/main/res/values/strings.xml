@@ -30,4 +30,5 @@
     <string name="card_number">Card Number</string>
     <string name="expiry_date_placeholder">MM/YY</string>
     <string name="cvv_place_holder">123</string>
+    <string name="order_history">Order History</string>
 </resources>

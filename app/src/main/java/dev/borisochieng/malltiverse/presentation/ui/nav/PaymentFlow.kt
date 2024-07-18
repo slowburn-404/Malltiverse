@@ -4,12 +4,12 @@ sealed class PaymentFlow (
     override val route: String,
     override val title: String,
     val paymentScreen: PaymentFlowNavItems.Payment,
-    val paymentSuccessfulScreen: PaymentFlowNavItems.PaymentSuccess
+    val paymentSuccessfulScreen: PaymentFlowNavItems.PaymentComplete
 ): NavItem {
     data object PaymentFlowScreens : PaymentFlow(
         route = "payment_flow_screens",
         title = "Payment",
         paymentScreen = PaymentFlowNavItems.Payment,
-        paymentSuccessfulScreen = PaymentFlowNavItems.PaymentSuccess
+        paymentSuccessfulScreen = PaymentFlowNavItems.PaymentComplete
     )
 }

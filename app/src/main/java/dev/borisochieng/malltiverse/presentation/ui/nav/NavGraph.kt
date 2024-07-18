@@ -10,6 +10,7 @@ import dev.borisochieng.malltiverse.presentation.MainActivityViewModel
 import dev.borisochieng.malltiverse.presentation.ui.screens.CartScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.CheckoutScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.HomeScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.OrderHistoryScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.PaymentScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.PaymentSuccessfulScreen
 
@@ -60,6 +61,9 @@ fun NavGraph(
 
                 })
             }
+        }
+        composable(route = PaymentFlowNavItems.OrderHistory.route) {
+            OrderHistoryScreen()
         }
     }
 }

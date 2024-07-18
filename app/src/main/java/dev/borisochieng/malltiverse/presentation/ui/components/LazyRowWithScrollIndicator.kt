@@ -78,7 +78,7 @@ fun LazyRowWithScrollIndicator(
                 ProductCard(
                     modifier = Modifier,
                     product = product,
-                    onAddToCart = {
+                    onAddToCartClick = {
                             viewModel.toggleCart(product)
                     }
                 )

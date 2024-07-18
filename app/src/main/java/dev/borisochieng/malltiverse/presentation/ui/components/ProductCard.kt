@@ -13,12 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,7 +38,7 @@ import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.shape
 fun ProductCard(
     modifier: Modifier = Modifier,
     product: DomainProduct,
-    onAddToCart: (DomainProduct) -> Unit,
+    onAddToCartClick: (DomainProduct) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -47,7 +47,7 @@ fun ProductCard(
             .fillMaxHeight()
             .clip(shape.card),
         shape = shape.card,
-        colors = CardDefaults.cardColors(colorScheme.background),
+        colors = CardDefaults.cardColors(Color.Transparent),
     ) {
         Column(
             modifier = Modifier
@@ -77,7 +77,7 @@ fun ProductCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(Color.Transparent)
             ) {
                 Text(
                     modifier = Modifier
@@ -124,7 +124,7 @@ fun ProductCard(
                         stringResource(id = R.string.add_to_cart)
                     },
                     onClick = {
-                        onAddToCart(product)
+                        onAddToCartClick(product)
                     }
                 )
             }

@@ -18,8 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
@@ -33,7 +39,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,11 +46,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.borisochieng.malltiverse.MalltiverseApplication
+import dev.borisochieng.malltiverse.R
 import dev.borisochieng.malltiverse.presentation.ui.nav.NavGraph
 import dev.borisochieng.malltiverse.presentation.ui.nav.BottomNavItems
 import dev.borisochieng.malltiverse.presentation.ui.components.ScreenTitle
@@ -81,7 +88,8 @@ class MainActivity : ComponentActivity() {
             )
             val paymentFlowNavItems = listOf(
                 PaymentFlowNavItems.Payment,
-                PaymentFlowNavItems.PaymentSuccess,
+                PaymentFlowNavItems.PaymentComplete,
+                PaymentFlowNavItems.OrderHistory
             )
 
             val navCurrentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -156,7 +164,19 @@ class MainActivity : ComponentActivity() {
                                 .windowInsetsPadding(WindowInsets.systemBars),
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MalltiverseTheme.colorScheme.background
-                            )
+                            ),
+                            actions = {
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate(PaymentFlowNavItems.OrderHistory.route)
+                                    }
+                                ){
+                                    Icon(
+                                        imageVector = Icons.Rounded.DateRange,
+                                        contentDescription = stringResource(R.string.order_history)
+                                    )
+                                }
+                            }
                         )
                     },
                     bottomBar = {

@@ -8,8 +8,14 @@ sealed class PaymentFlowNavItems(
         route = "payment_screen",
         title = "Payment"
     )
-    data object PaymentSuccess : PaymentFlowNavItems(
+    data object PaymentComplete : PaymentFlowNavItems(
         route = "payment_complete",
         title = "Payment"
+    )
+
+    //TODO(Move somewhere else)
+    data object OrderHistory : PaymentFlowNavItems(
+        route = "order_history",
+        title = "Order History"
     )
 }
