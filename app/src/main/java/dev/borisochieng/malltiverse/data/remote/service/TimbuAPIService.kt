@@ -1,6 +1,6 @@
-package dev.borisochieng.malltiverse.data.service
+package dev.borisochieng.malltiverse.data.remote.service
 
-import dev.borisochieng.malltiverse.data.models.ProductResponse
+import dev.borisochieng.malltiverse.data.remote.models.ProductResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

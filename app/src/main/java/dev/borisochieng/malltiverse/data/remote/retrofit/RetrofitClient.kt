@@ -1,4 +1,4 @@
-package dev.borisochieng.malltiverse.data.retrofit
+package dev.borisochieng.malltiverse.data.remote.retrofit
 
 import dev.borisochieng.malltiverse.util.Constants.TIMBU_API_BASE_URL
 import okhttp3.OkHttpClient

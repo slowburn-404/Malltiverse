@@ -1,4 +1,4 @@
-package dev.borisochieng.malltiverse.data.models
+package dev.borisochieng.malltiverse.data.remote.models
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

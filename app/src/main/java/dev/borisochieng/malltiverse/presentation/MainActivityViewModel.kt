@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dev.borisochieng.malltiverse.data.NetworkResponse
+import dev.borisochieng.malltiverse.data.remote.NetworkResponse
 import dev.borisochieng.malltiverse.domain.TimbuAPIRepository
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.util.Constants.API_KEY
@@ -13,7 +13,6 @@ import dev.borisochieng.malltiverse.util.Constants.ORGANIZATION_ID
 import dev.borisochieng.malltiverse.util.CoroutineDispatcherProvider
 import dev.borisochieng.malltiverse.util.UIEvents
 import dev.borisochieng.malltiverse.util.UIState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

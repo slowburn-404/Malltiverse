@@ -1,7 +1,7 @@
-package dev.borisochieng.malltiverse.data
+package dev.borisochieng.malltiverse.data.remote
 
-import dev.borisochieng.malltiverse.data.models.CurrentPrice
-import dev.borisochieng.malltiverse.data.models.ProductResponse
+import dev.borisochieng.malltiverse.data.remote.models.CurrentPrice
+import dev.borisochieng.malltiverse.data.remote.models.ProductResponse
 import dev.borisochieng.malltiverse.domain.models.DomainCategory
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.util.Constants.BASE_IMAGE_URL
@@ -21,7 +21,8 @@ fun ProductResponse.toDomainProduct(): List<DomainProduct> =
             } ?: emptyList(),
             availableQuantity = product.availableQuantity?.toInt() ?: 0,
             quantity = 1,
-            isAddedToCart = false
+            isAddedToCart = false,
+            isAddedToWishlist = false
         )
     }
 

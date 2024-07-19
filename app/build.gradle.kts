@@ -4,6 +4,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp.kotlin)
+    alias(libs.plugins.compose.compiler)
 }
 
 fun getLocalProperty(key: String): String {
@@ -49,7 +51,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        compose = true
+        //compose = true
         buildConfig = true
     }
     composeOptions {
@@ -86,6 +88,11 @@ dependencies {
     implementation(libs.coil.compose)
     //lottie
     implementation(libs.lottie)
+    //room
+    implementation(libs.room.runtime)
+    implementation(libs.room.kotlin.coroutines)
+    annotationProcessor(libs.room.annotation.processor)
+    ksp(libs.room.annotation.processor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

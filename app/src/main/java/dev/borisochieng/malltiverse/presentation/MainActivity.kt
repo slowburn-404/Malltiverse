@@ -19,10 +19,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -170,7 +167,7 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         navController.navigate(PaymentFlowNavItems.OrderHistory.route)
                                     }
-                                ){
+                                ) {
                                     Icon(
                                         imageVector = Icons.Rounded.DateRange,
                                         contentDescription = stringResource(R.string.order_history)
@@ -219,7 +216,12 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier
                                                     .size(40.dp)
                                                     .background(
-                                                        color = if (selectedItemIndex == index) MalltiverseTheme.colorScheme.primary else Color.Transparent,
+                                                        color =
+                                                        if (selectedItemIndex == index) {
+                                                            MalltiverseTheme.colorScheme.primary
+                                                        } else {
+                                                            Color.Transparent
+                                                        },
                                                         shape = CircleShape
                                                     )
                                                     .padding(8.dp),
@@ -254,7 +256,6 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         color = MalltiverseTheme.colorScheme.background
                     ) {
-
                         NavGraph(
                             navController = navController,
                             viewModel = mainActivityViewModel,

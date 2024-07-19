@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.1"
-kotlin = "1.9.0"
+kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -13,6 +13,8 @@ okhttpVersion = "4.12.0"
 coilVersion = "2.6.0"
 composeNavigation = "2.7.7"
 lottieVersion = "6.4.1"
+roomVersion = "2.6.1"
+kspVersion = "2.0.0-1.0.23"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,8 +39,13 @@ coil = { group = "io.coil-kt", name = "coil", version.ref = "coilVersion" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }
 androidx-navigation-compose= { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation" }
 lottie = {group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieVersion" }
+room-runtime = {group = "androidx.room", name = "room-runtime", version.ref = "roomVersion"}
+room-annotation-processor = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+room-kotlin-coroutines = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id="org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp-kotlin = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 
