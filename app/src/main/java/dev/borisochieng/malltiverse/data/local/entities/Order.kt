@@ -8,12 +8,8 @@ import androidx.room.PrimaryKey
 data class Order(
     @PrimaryKey
     val id: String,
-    @ColumnInfo(name = "name")
     val name: String,
-    @ColumnInfo(name = "description")
     val description: String,
-    @ColumnInfo(name = "price")
     val price: Double,
-    @ColumnInfo(name = "image_url")
     val imageUrl: String
 )

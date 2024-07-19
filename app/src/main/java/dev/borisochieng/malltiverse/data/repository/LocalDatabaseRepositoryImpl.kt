@@ -9,7 +9,6 @@ import dev.borisochieng.malltiverse.data.local.toDomainOrder
 import dev.borisochieng.malltiverse.data.local.toDomainWishListItem
 import dev.borisochieng.malltiverse.domain.LocalDatabaseRepository
 import dev.borisochieng.malltiverse.domain.models.DomainOrder
-import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.domain.models.DomainWishlistItem
 import dev.borisochieng.malltiverse.util.CoroutineDispatcherProvider
 import kotlinx.coroutines.flow.Flow

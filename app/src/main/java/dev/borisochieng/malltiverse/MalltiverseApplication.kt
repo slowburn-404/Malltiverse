@@ -1,7 +1,7 @@
 package dev.borisochieng.malltiverse
 
 import android.app.Application
-import dev.borisochieng.malltiverse.data.local.MalltiverseDatabase
+import dev.borisochieng.malltiverse.data.local.database.MalltiverseDatabase
 import dev.borisochieng.malltiverse.data.repository.TimbuAPIRepositoryImpl
 import dev.borisochieng.malltiverse.data.remote.retrofit.RetrofitClient
 import dev.borisochieng.malltiverse.data.remote.service.TimbuAPIService
