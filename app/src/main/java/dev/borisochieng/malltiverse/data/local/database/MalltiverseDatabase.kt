@@ -10,6 +10,7 @@ import dev.borisochieng.malltiverse.data.local.dao.WishListDao
 import dev.borisochieng.malltiverse.data.local.entities.Order
 import dev.borisochieng.malltiverse.data.local.entities.WishListItem
 import androidx.room.AutoMigration
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -21,13 +22,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 //        AutoMigration(from = 1, to = 2)
 //    ]
 )
+@TypeConverters(DateConverter::class)
 abstract class MalltiverseDatabase :
     RoomDatabase() {
     abstract fun orderHistoryDao(): OrderHistoryDao
     abstract fun wishListDao(): WishListDao
 
     companion object {
-        const val LATEST_VERSION = 2
+        const val LATEST_VERSION = 3
 
         //create singleton instance
         @Volatile
@@ -43,6 +45,37 @@ abstract class MalltiverseDatabase :
 
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Create new table with the correct schema
+        db.execSQL("""
+            CREATE TABLE order_history_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                imageUrl TEXT NOT NULL,
+                price TEXT NOT NULL DEFAULT '0.0',
+                timestamp INTEGER NOT NULL DEFAULT 0,
+                status INTEGER NOT NULL DEFAULT 0
+            )
+        """.trimIndent())
+
+        // Copy data from the old table to the new table
+        db.execSQL("""
+            INSERT INTO order_history_new (id, name, description, imageUrl)
+            SELECT id, name, description, imageUrl
+            FROM order_history
+        """.trimIndent())
+
+        // Drop the old table
+        db.execSQL("DROP TABLE order_history")
+
+        // Rename the new table to the old table's name
+        db.execSQL("ALTER TABLE order_history_new RENAME TO order_history")
+    }
+}
+
+
 
         fun getDatabase(context: Context): MalltiverseDatabase =
             DB_INSTANCE ?: synchronized(this) {
@@ -55,7 +88,7 @@ abstract class MalltiverseDatabase :
                 MalltiverseDatabase::class.java,
                 "malltiverse.db"
             )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
 //                .addCallback(object : Callback() {
 //                    override fun onCreate(db: SupportSQLiteDatabase) {

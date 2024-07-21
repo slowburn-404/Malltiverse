@@ -7,6 +7,7 @@ import dev.borisochieng.malltiverse.data.local.DatabaseResponse
 import dev.borisochieng.malltiverse.data.remote.NetworkResponse
 import dev.borisochieng.malltiverse.domain.LocalDatabaseRepository
 import dev.borisochieng.malltiverse.domain.TimbuAPIRepository
+import dev.borisochieng.malltiverse.domain.models.DomainOrder
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.domain.models.DomainWishlistItem
 import dev.borisochieng.malltiverse.domain.toOrder
@@ -64,7 +65,7 @@ class MainActivityViewModel(
             )
         }
 
-        withTimeoutOrNull(5000L) { // Timeout after 5 seconds
+        withTimeoutOrNull(10000L) { // Timeout after 10 seconds
             val productsResponse = timbuAPIRepository.getProducts(
                 organizationID = organizationID,
                 appID = appId,
@@ -84,7 +85,7 @@ class MainActivityViewModel(
                         _eventFlow.emit(UIEvents.SnackBarEvent(message = "No products found"))
                     } else {
                         withContext(dispatcher.Default) {
-                            val wishlist = localDatabaseRepository.getWishlist().first()
+                            //val wishlist = localDatabaseRepository.getWishlist().first()
                             val groupedProductsByCategory = allProducts.flatMap { product ->
                                 product.category.map { category ->
                                     category.name to product
@@ -151,6 +152,8 @@ class MainActivityViewModel(
                         product = product
                     )
                 }
+
+                product?.id?.let { Log.d("Product ID from n/w", it) }
             }
 
             is NetworkResponse.Error -> {
@@ -398,6 +401,22 @@ class MainActivityViewModel(
                             message = isProductInWishlist.message
                         )
                     )
+                }
+            }
+        }
+
+    fun getOrderById(orderId: String) =
+        viewModelScope.launch {
+            localDatabaseRepository.getOrderById(orderId).collect{ order ->
+                when(order){
+                    is DatabaseResponse.Success -> {
+                        _uiState.update {
+                            it.copy(order = order.items)
+                        }
+                    }
+                    is DatabaseResponse.Error -> {
+                        _eventFlow.emit(UIEvents.SnackBarEvent(message = order.message))
+                    }
                 }
             }
         }

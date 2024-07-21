@@ -35,4 +35,9 @@
     <string name="description">Description</string>
     <string name="wishlist">Wishlist</string>
     <string name="back">Back</string>
+    <string name="card_number_error">Card number cannot be empty</string>
+    <string name="expiry_date_error">Date cannot be empty</string>
+    <string name="cvv_error">CVV cannot be empty</string>
+    <string name="cvv_error_length">CVV cannot be less than 3 digits</string>
+    <string name="card_number_error_length">Card number cannot be less than 16 digits</string>
 </resources>

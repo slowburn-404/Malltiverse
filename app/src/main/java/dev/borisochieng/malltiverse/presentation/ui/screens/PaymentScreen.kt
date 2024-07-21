@@ -28,7 +28,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.borisochieng.malltiverse.R
-import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.presentation.ui.components.PaymentCard
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.shape
@@ -38,13 +37,15 @@ fun PaymentScreen(
     onMakePaymentClick: () -> Unit
 ) {
     var cardNumber by remember { mutableStateOf("") }
+    var cardNumberError by remember { mutableStateOf<String?>(null) }
     var expiryDate by remember { mutableStateOf("") }
+    var expiryDateError by remember { mutableStateOf<String?>(null) }
     var cvv by remember { mutableStateOf("") }
+    var cvvError by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-
         PaymentCard(
             modifier = Modifier,
             cardNumber = cardNumber,
@@ -61,15 +62,19 @@ fun PaymentScreen(
         )
 
         OutlinedTextField(
-            value = cardNumber.chunked(4).joinToString(""),
-            onValueChange = { if (it.length <= 16) cardNumber = it },
+            value = cardNumber.chunked(4).joinToString(" "),
+            onValueChange = {
+                if (it.replace(" ", "").length <= 16) {
+                    cardNumber = it.replace(" ", "")
+                    cardNumberError = validateCardNumber(cardNumber)
+                }
+            },
             shape = shape.button,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 6.dp)
-                .fillMaxWidth()
-                .height(50.dp),
+                .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MalltiverseTheme.colorScheme.background,
                 unfocusedContainerColor = MalltiverseTheme.colorScheme.background,
@@ -83,6 +88,17 @@ fun PaymentScreen(
                     color = Color.LightGray
                 )
             },
+            isError = cardNumberError != null,
+            supportingText = {
+                if (cardNumberError != null) {
+                    Text(
+                        text = cardNumberError ?: "",
+                        color = Color.Red,
+                        style = MalltiverseTheme.typography.labelSmall,
+                        modifier = Modifier.padding(4.dp)
+                    )
+                }
+            }
         )
 
         Row {
@@ -99,14 +115,14 @@ fun PaymentScreen(
                     value = expiryDate,
                     onValueChange = {
                         expiryDate = formatExpiryDate(it)
+                        expiryDateError = validateExpiryDate(expiryDate)
                     },
                     shape = shape.button,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 6.dp)
-                        .width(180.dp)
-                        .height(50.dp),
+                        .width(180.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = MalltiverseTheme.colorScheme.background,
                         unfocusedContainerColor = MalltiverseTheme.colorScheme.background,
@@ -120,6 +136,17 @@ fun PaymentScreen(
                             color = Color.LightGray
                         )
                     },
+                    isError = expiryDateError != null,
+                    supportingText = {
+                        if (expiryDateError != null) {
+                            Text(
+                                text = expiryDateError ?: "",
+                                color = Color.Red,
+                                style = MalltiverseTheme.typography.labelSmall,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                        }
+                    }
                 )
             }
 
@@ -135,15 +162,17 @@ fun PaymentScreen(
                 OutlinedTextField(
                     value = cvv,
                     onValueChange = {
-                        if (it.length <= 3) cvv = it
+                        if (it.length <= 3) {
+                            cvv = it
+                            cvvError = validateCVV(cvv)
+                        }
                     },
                     shape = shape.button,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 6.dp)
-                        .width(180.dp)
-                        .height(50.dp),
+                        .width(180.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = MalltiverseTheme.colorScheme.background,
                         unfocusedContainerColor = MalltiverseTheme.colorScheme.background,
@@ -157,9 +186,19 @@ fun PaymentScreen(
                             color = Color.LightGray
                         )
                     },
+                    isError = cvvError != null,
+                    supportingText = {
+                        if (cvvError != null) {
+                            Text(
+                                text = cvvError ?: "",
+                                color = Color.Red,
+                                style = MalltiverseTheme.typography.labelSmall,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                        }
+                    }
                 )
             }
-
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -175,16 +214,42 @@ fun PaymentScreen(
                 containerColor = MalltiverseTheme.colorScheme.primary,
                 contentColor = MalltiverseTheme.colorScheme.onPrimary
             ),
-            shape = shape.button
+            shape = shape.button,
+            enabled = cardNumberError == null && expiryDateError == null && cvvError == null &&
+                cardNumber.isNotEmpty() && expiryDate.isNotEmpty() && cvv.isNotEmpty()
         ) {
-
             Text(
                 text = stringResource(R.string.make_payment)
             )
         }
-
     }
 }
+
+private fun validateCardNumber(input: String): String? {
+    return when {
+        input.isEmpty() -> "Card number cannot be empty"
+        input.length != 16 -> "Card number must be 16 digits"
+        else -> null
+    }
+}
+
+private fun validateExpiryDate(input: String): String? {
+    return when {
+        input.isEmpty() -> "Expiry date cannot be empty"
+        !input.matches(Regex("(0[1-9]|1[0-2])/\\d{2}")) -> "Invalid expiry date format (MM/YY)"
+        else -> null
+    }
+}
+
+private fun validateCVV(input: String): String? {
+    return when {
+        input.isEmpty() -> "CVV cannot be empty"
+        input.length != 3 -> "CVV must be 3 digits"
+        else -> null
+    }
+}
+
+
 
 fun formatExpiryDate(date: String): String {
     //allow only digits and slash

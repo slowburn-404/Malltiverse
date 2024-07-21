@@ -19,4 +19,6 @@ interface LocalDatabaseRepository {
     suspend fun removeFromWishlist(wishListItem: WishListItem): DatabaseResponse<Unit>
 
     suspend fun addToWishList(wishListItem: WishListItem): DatabaseResponse<Unit>
+
+    suspend fun getOrderById(id: String): Flow<DatabaseResponse<DomainOrder>>
 }

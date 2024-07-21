@@ -15,11 +15,12 @@ interface TimbuAPIService {
         @Query("Appid") appID: String,
     ): Response<ProductResponse>
 
-    @GET("/products/{id}")
+    @GET("/product/{productID}")
     suspend fun getProduct(
-        @Query("id") productID: String,
-        @Query("Apikey") apiKey: String,
+        @Query("product_id") productID: String,
         @Query("organization_id") organizationID: String,
         @Query("Appid") appID: String,
+        @Query("Apikey") apiKey: String,
+
     ): Response<Product>
 }

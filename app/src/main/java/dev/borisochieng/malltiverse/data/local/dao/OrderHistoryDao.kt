@@ -20,4 +20,7 @@ interface OrderHistoryDao {
     @Delete
     fun deleteOrder(order: Order)
 
+    @Query("SELECT * FROM order_history WHERE id = :id")
+    fun getOrderById(id: String): Flow<Order>
+
 }

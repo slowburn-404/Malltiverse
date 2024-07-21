@@ -7,5 +7,8 @@ data class DomainOrder(
     val id: String,
     val name: String,
     val description: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val price: String,
+    val status: Int,
+    val timeStamp: String
 )

@@ -34,6 +34,7 @@ import dev.borisochieng.malltiverse.R
 import dev.borisochieng.malltiverse.domain.models.DomainOrder
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.shape
+import java.util.Date
 
 @Composable
 fun OrderItem(order: DomainOrder, onRemoveFromOrderHistoryClick: () -> Unit, onCardClick: (DomainOrder) -> Unit) {
@@ -123,7 +124,10 @@ fun OrderItemPreview() {
             id = "122d",
             name = "Product 1",
             description = "Description 1",
-            imageUrl = "https://unsplash.com/photos/white-xbox-one-game-controller-L6hupRkWkjg"
+            imageUrl = "https://unsplash.com/photos/white-xbox-one-game-controller-L6hupRkWkjg",
+            price = "10.0",
+            status = 1,
+            timeStamp = Date().toString()
         ),
         onRemoveFromOrderHistoryClick = {},
         onCardClick = {}

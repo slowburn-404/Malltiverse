@@ -29,4 +29,11 @@ sealed class OtherNavItems(
         route = "wishlist",
         title = "Wishlist"
     )
+
+    data object SingleOrder: OtherNavItems(
+        route = "order/{orderId}",
+        title = "Order"
+    ) {
+        fun createRoute(orderId: String) = "order/$orderId"
+    }
 }

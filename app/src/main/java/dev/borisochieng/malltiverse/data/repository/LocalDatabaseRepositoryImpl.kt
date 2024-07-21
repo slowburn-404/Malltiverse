@@ -91,4 +91,15 @@ class LocalDatabaseRepositoryImpl(
                 DatabaseResponse.Error(message = "Something went wrong please try again")
             }
         }
+
+    override suspend fun getOrderById(id: String): Flow<DatabaseResponse<DomainOrder>> = flow{
+        try{
+          orderHistoryDao.getOrderById(id).collect{ order ->
+              emit(DatabaseResponse.Success(order.toDomainOrder()))
+          }
+        } catch(e:Exception) {
+            e.printStackTrace()
+            DatabaseResponse.Error(message = "Something went wrong please try again")
+        }
+    }.flowOn(dispatcher.IO)
 }

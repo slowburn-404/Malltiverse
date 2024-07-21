@@ -14,5 +14,6 @@ data class UIState(
     val orderHistory: List<DomainOrder> = emptyList(),
     val wishlist: List<DomainWishlistItem> = emptyList(),
     val product: DomainProduct? = null,
+    val order: DomainOrder? = null,
     val errorMessage: String = ""
 )

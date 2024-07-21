@@ -1,5 +1,6 @@
 package dev.borisochieng.malltiverse.presentation.ui.nav
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -16,6 +17,7 @@ import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHi
 import dev.borisochieng.malltiverse.presentation.ui.screens.PaymentScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.PaymentSuccessfulScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.ProductScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.SingleOrderScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.WishlistScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHistoryViewModel
 
@@ -26,7 +28,6 @@ fun NavGraph(
     mainActivityViewModel: MainActivityViewModel,
     snackBarHostState: SnackbarHostState,
     orderHistoryViewModel: OrderHistoryViewModel
-
 ) {
 
     NavHost(
@@ -77,7 +78,7 @@ fun NavGraph(
         }
         composable(route = OtherNavItems.OrderHistory.route) {
             OrderHistoryScreen(orderHistoryViewModel, snackBarHostState, onCardClick = { product ->
-                navController.navigate(OtherNavItems.Product.createRoute(product.id))
+                navController.navigate(OtherNavItems.SingleOrder.createRoute(product.id))
             })
         }
 
@@ -86,6 +87,9 @@ fun NavGraph(
             arguments = listOf(navArgument("productId") { type = NavType.StringType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId")
+
+            Log.d("Product ID", productId.toString())
+
             if (productId != null) {
                 ProductScreen(
                     productID = productId,
@@ -104,6 +108,16 @@ fun NavGraph(
                 onCardClick = { product ->
                     navController.navigate(OtherNavItems.Product.createRoute(product.id))
                 })
+        }
+
+        composable(
+            route = OtherNavItems.SingleOrder.route,
+            arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId")
+            if (orderId != null) {
+                SingleOrderScreen(orderId = orderId, viewModel = mainActivityViewModel)
+            }
         }
     }
 }
