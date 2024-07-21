@@ -38,14 +38,17 @@ import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.shape
 
 @Composable
 fun CheckoutScreen(
-    onGoToPaymentClick: () -> Unit,
+    onGoToPaymentClick: () -> Unit
 ) {
     var selected1 by remember { mutableStateOf(true) }
     var selected2 by remember { mutableStateOf(false) }
 
     var delivery by remember { mutableStateOf("") }
+    var deliveryError by remember { mutableStateOf<String?>(null) }
     var contact1 by remember { mutableStateOf("") }
+    var contact1Error by remember { mutableStateOf<String?>(null) }
     var contact2 by remember { mutableStateOf("") }
+    var contact2Error by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -129,20 +132,32 @@ fun CheckoutScreen(
 
         OutlinedTextField(
             value = delivery,
-            onValueChange = { delivery = it },
+            onValueChange = {
+                delivery = it
+                deliveryError = validateDelivery(delivery)
+            },
             shape = shape.button,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .fillMaxWidth()
-                .height(50.dp),
+                .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MalltiverseTheme.colorScheme.background,
                 unfocusedContainerColor = MalltiverseTheme.colorScheme.background,
                 focusedIndicatorColor = MalltiverseTheme.colorScheme.primary,
                 cursorColor = MalltiverseTheme.colorScheme.primary,
-            )
+            ),
+            isError = deliveryError != null,
+            supportingText = {
+                if (deliveryError != null)
+                    Text(
+                        deliveryError ?: "",
+                        color = Color.Red,
+                        style = MalltiverseTheme.typography.labelSmall,
+                        modifier = Modifier.padding(4.dp)
+                    )
+            }
         )
 
         Text(
@@ -156,14 +171,16 @@ fun CheckoutScreen(
 
         OutlinedTextField(
             value = contact1,
-            onValueChange = { contact1 = it },
+            onValueChange = {
+                contact1 = it
+                contact1Error = validateContact(contact1)
+            },
             shape = shape.button,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 6.dp)
-                .width(180.dp)
-                .height(50.dp),
+                .width(180.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MalltiverseTheme.colorScheme.background,
                 unfocusedContainerColor = MalltiverseTheme.colorScheme.background,
@@ -177,18 +194,30 @@ fun CheckoutScreen(
                     color = Color.LightGray
                 )
             },
+            isError = contact1Error != null,
+            supportingText = {
+                if (contact1Error != null)
+                    Text(
+                        contact1Error ?: "",
+                        color = Color.Red,
+                        style = MalltiverseTheme.typography.labelSmall,
+                        modifier = Modifier.padding(4.dp)
+                    )
+            }
         )
 
         OutlinedTextField(
             value = contact2,
-            onValueChange = { contact2 = it },
+            onValueChange = {
+                contact2 = it
+                contact2Error = validateContact(contact2)
+            },
             shape = shape.button,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 6.dp)
-                .width(180.dp)
-                .height(50.dp),
+                .width(180.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MalltiverseTheme.colorScheme.background,
                 unfocusedContainerColor = MalltiverseTheme.colorScheme.background,
@@ -205,6 +234,16 @@ fun CheckoutScreen(
                     modifier = Modifier.background(Color.Transparent)
                 )
             },
+            isError = contact2Error != null,
+            supportingText = {
+                if (contact2Error != null)
+                    Text(
+                        contact2Error ?: "",
+                        color = Color.Red,
+                        style = MalltiverseTheme.typography.labelSmall,
+                        modifier = Modifier.padding(4.dp)
+                    )
+            }
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -220,17 +259,25 @@ fun CheckoutScreen(
                 containerColor = MalltiverseTheme.colorScheme.primary,
                 contentColor = MalltiverseTheme.colorScheme.onPrimary
             ),
-            shape = shape.button
+            shape = shape.button,
+            enabled = deliveryError == null && contact1Error == null && contact2Error == null &&
+                    delivery.isNotEmpty() && contact1.isNotEmpty()
         ) {
-
             Text(
                 text = stringResource(R.string.go_to_payment)
             )
         }
-
-
     }
 }
+
+private fun validateDelivery(input: String): String? {
+    return if (input.isEmpty()) "Delivery address is required" else null
+}
+
+private fun validateContact(input: String): String? {
+    return if (input.isEmpty()) "At least 1 contact is required" else null
+}
+
 
 @Preview(showBackground = true)
 @Composable

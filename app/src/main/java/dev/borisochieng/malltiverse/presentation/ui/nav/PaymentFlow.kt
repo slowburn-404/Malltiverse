@@ -3,13 +3,13 @@ package dev.borisochieng.malltiverse.presentation.ui.nav
 sealed class PaymentFlow (
     override val route: String,
     override val title: String,
-    val paymentScreen: PaymentFlowNavItems.Payment,
-    val paymentSuccessfulScreen: PaymentFlowNavItems.PaymentSuccess
+    val paymentScreen: OtherNavItems.Payment,
+    val paymentSuccessfulScreen: OtherNavItems.PaymentComplete
 ): NavItem {
     data object PaymentFlowScreens : PaymentFlow(
         route = "payment_flow_screens",
         title = "Payment",
-        paymentScreen = PaymentFlowNavItems.Payment,
-        paymentSuccessfulScreen = PaymentFlowNavItems.PaymentSuccess
+        paymentScreen = OtherNavItems.Payment,
+        paymentSuccessfulScreen = OtherNavItems.PaymentComplete
     )
 }

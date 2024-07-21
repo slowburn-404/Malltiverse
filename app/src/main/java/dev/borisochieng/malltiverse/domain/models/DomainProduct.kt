@@ -12,5 +12,6 @@ data class DomainProduct(
     val category: List<DomainCategory>,
     val isAddedToCart: Boolean,
     val availableQuantity: Int,
-    var quantity: Int
+    val quantity: Int,
+    val isAddedToWishlist: Boolean
 )

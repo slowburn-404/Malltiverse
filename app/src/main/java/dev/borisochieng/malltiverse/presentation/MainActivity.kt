@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -18,8 +17,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
@@ -33,7 +39,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,29 +46,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.borisochieng.malltiverse.MalltiverseApplication
+import dev.borisochieng.malltiverse.R
 import dev.borisochieng.malltiverse.presentation.ui.nav.NavGraph
 import dev.borisochieng.malltiverse.presentation.ui.nav.BottomNavItems
 import dev.borisochieng.malltiverse.presentation.ui.components.ScreenTitle
 import dev.borisochieng.malltiverse.presentation.ui.components.getIcons
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme
-import dev.borisochieng.malltiverse.util.Constants.API_KEY
-import dev.borisochieng.malltiverse.util.Constants.APP_ID
-import dev.borisochieng.malltiverse.util.Constants.ORGANIZATION_ID
 import dev.borisochieng.malltiverse.util.UIEvents
-import dev.borisochieng.malltiverse.presentation.ui.nav.PaymentFlowNavItems
+import dev.borisochieng.malltiverse.presentation.ui.nav.OtherNavItems
+import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHistoryViewModel
 
 class MainActivity : ComponentActivity() {
     private val mainActivityViewModel: MainActivityViewModel by viewModels {
         val application = application as MalltiverseApplication
-        MainActivityViewModelFactory(
-            application.timbuAPIRepositoryImpl,
-            application.dispatcherProvider
-        )
+        application.sharedViewModelFactory
+    }
+
+    private val orderHistoryViewModel: OrderHistoryViewModel by viewModels {
+        val application = application as MalltiverseApplication
+        application.sharedViewModelFactory
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -79,15 +85,19 @@ class MainActivity : ComponentActivity() {
                 BottomNavItems.Cart,
                 BottomNavItems.Checkout
             )
-            val paymentFlowNavItems = listOf(
-                PaymentFlowNavItems.Payment,
-                PaymentFlowNavItems.PaymentSuccess,
+            val otherNavItems = listOf(
+                OtherNavItems.Payment,
+                OtherNavItems.PaymentComplete,
+                OtherNavItems.OrderHistory,
+                OtherNavItems.Wishlist,
+                OtherNavItems.Product,
+                OtherNavItems.SingleOrder
             )
 
             val navCurrentBackStackEntry by navController.currentBackStackEntryAsState()
             val currentScreen =
                 bottomNavItems.find { it.route == navCurrentBackStackEntry?.destination?.route }
-                    ?: paymentFlowNavItems.find { it.route == navCurrentBackStackEntry?.destination?.route }
+                    ?: otherNavItems.find { it.route == navCurrentBackStackEntry?.destination?.route }
 
             var selectedItemIndex by remember {
                 mutableStateOf(0)
@@ -118,26 +128,12 @@ class MainActivity : ComponentActivity() {
                             snackbar = {
                                 Snackbar(
                                     modifier = Modifier
-                                        .padding(16.dp),
-                                    action = {
-                                        Text(
-                                            text = "RETRY",
-                                            style = MalltiverseTheme.typography.body,
-                                            color = MalltiverseTheme.colorScheme.primary,
-                                            modifier = Modifier
-                                                .padding(8.dp)
-                                                .clickable {
-                                                    mainActivityViewModel.getProducts(
-                                                        apiKey = API_KEY,
-                                                        organizationID = ORGANIZATION_ID,
-                                                        appId = APP_ID
-                                                    )
-                                                },
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    }
+                                        .padding(16.dp)
                                 ) {
-                                    Text(text = uiState.errorMessage)
+                                    Text(
+                                        text = uiState.errorMessage,
+                                        color = Color.White
+                                    )
                                 }
                             }
                         )
@@ -156,7 +152,46 @@ class MainActivity : ComponentActivity() {
                                 .windowInsetsPadding(WindowInsets.systemBars),
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MalltiverseTheme.colorScheme.background
-                            )
+                            ),
+                            actions = {
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate(OtherNavItems.OrderHistory.route) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.DateRange,
+                                        contentDescription = stringResource(R.string.order_history)
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    navController.navigate(OtherNavItems.Wishlist.route) {
+                                        launchSingleTop = true
+                                    }
+
+                            }) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Favorite,
+                                        contentDescription = stringResource(R.string.wishlist)
+                                    )
+
+                        }
+                            },
+                            navigationIcon = {
+                                if(otherNavItems.contains(currentScreen)) {
+                                    IconButton(onClick = {
+                                        navController.navigateUp()
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                            contentDescription = stringResource(R.string.back)
+                                        )
+                                    }
+                                }
+                            }
                         )
                     },
                     bottomBar = {
@@ -199,7 +234,12 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier
                                                     .size(40.dp)
                                                     .background(
-                                                        color = if (selectedItemIndex == index) MalltiverseTheme.colorScheme.primary else Color.Transparent,
+                                                        color =
+                                                        if (selectedItemIndex == index) {
+                                                            MalltiverseTheme.colorScheme.primary
+                                                        } else {
+                                                            Color.Transparent
+                                                        },
                                                         shape = CircleShape
                                                     )
                                                     .padding(8.dp),
@@ -234,11 +274,11 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         color = MalltiverseTheme.colorScheme.background
                     ) {
-
                         NavGraph(
                             navController = navController,
-                            viewModel = mainActivityViewModel,
-                            snackBarHostState = snackBarHostState
+                            mainActivityViewModel = mainActivityViewModel,
+                            snackBarHostState = snackBarHostState,
+                            orderHistoryViewModel = orderHistoryViewModel
                         )
                     }
                 }

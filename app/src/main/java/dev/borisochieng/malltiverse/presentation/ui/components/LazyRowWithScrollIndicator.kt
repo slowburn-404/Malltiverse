@@ -17,6 +17,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
+import dev.borisochieng.malltiverse.domain.models.DomainWishlistItem
+import dev.borisochieng.malltiverse.domain.toDomainWishlistItem
+import dev.borisochieng.malltiverse.domain.toWishListItem
 import dev.borisochieng.malltiverse.presentation.MainActivityViewModel
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme
 
@@ -25,6 +28,7 @@ fun LazyRowWithScrollIndicator(
     products: List<DomainProduct>,
     viewModel: MainActivityViewModel,
     categoryName: String,
+    onAddToWishlistClick: (DomainWishlistItem) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -69,7 +73,6 @@ fun LazyRowWithScrollIndicator(
 
         LazyRow(
             modifier = Modifier
-                .height(360.dp)
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             state = lazyListState
@@ -78,8 +81,11 @@ fun LazyRowWithScrollIndicator(
                 ProductCard(
                     modifier = Modifier,
                     product = product,
-                    onAddToCart = {
+                    onAddToCartClick = {
                             viewModel.toggleCart(product)
+                    },
+                    onAddToWishlistClick = {
+                        onAddToWishlistClick(product.toDomainWishlistItem())
                     }
                 )
             }

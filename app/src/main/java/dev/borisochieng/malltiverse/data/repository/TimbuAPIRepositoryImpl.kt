@@ -1,15 +1,24 @@
 package dev.borisochieng.malltiverse.data.repository
 
-import dev.borisochieng.malltiverse.data.NetworkResponse
-import dev.borisochieng.malltiverse.data.service.TimbuAPIService
-import dev.borisochieng.malltiverse.data.toDomainProduct
+import dev.borisochieng.malltiverse.data.local.DatabaseResponse
+import dev.borisochieng.malltiverse.data.local.dao.OrderHistoryDao
+import dev.borisochieng.malltiverse.data.local.dao.WishListDao
+import dev.borisochieng.malltiverse.data.local.entities.Order
+import dev.borisochieng.malltiverse.data.local.entities.WishListItem
+import dev.borisochieng.malltiverse.data.remote.NetworkResponse
+import dev.borisochieng.malltiverse.data.remote.service.TimbuAPIService
+import dev.borisochieng.malltiverse.data.remote.toDomainProduct
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.domain.TimbuAPIRepository
+import dev.borisochieng.malltiverse.domain.models.DomainOrder
 import dev.borisochieng.malltiverse.util.CoroutineDispatcherProvider
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
-class TimbuAPIRepositoryImpl(private val apiService: TimbuAPIService, private val dispatcher: CoroutineDispatcherProvider) : TimbuAPIRepository {
+class TimbuAPIRepositoryImpl(
+    private val apiService: TimbuAPIService,
+    private val dispatcher: CoroutineDispatcherProvider
+) : TimbuAPIRepository {
     override suspend fun getProducts(
         apiKey: String,
         organizationID: String,
@@ -44,4 +53,40 @@ class TimbuAPIRepositoryImpl(private val apiService: TimbuAPIService, private va
                 NetworkResponse.Error("An unexpected error occurred. Please try again later.")
             }
         }
+
+    override suspend fun getProduct(
+        productID: String,
+        apiKey: String,
+        organizationID: String,
+        appID: String
+    ): NetworkResponse<DomainProduct> =
+        withContext(dispatcher.IO) {
+            try {
+                val response = apiService.getProduct(
+                    productID = productID,
+                    apiKey = apiKey,
+                    organizationID = organizationID,
+                    appID = appID
+                )
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    NetworkResponse.Success(body?.toDomainProduct())
+                } else {
+                    val errorMessage = when (response.code()) {
+                        400 -> "We encountered a problem with your request. Please try again."
+                        404 -> "The resource you're looking for couldn't be found. It might have been removed or is temporarily unavailable."
+                        500 -> "Something went wrong on our end. Please try again later."
+                        else -> "An unexpected error occurred. Please try again."
+                    }
+                    NetworkResponse.Error(errorMessage)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                NetworkResponse.Error("An unexpected error occurred. Please try again later.")
+            }
+        }
+
+
 }

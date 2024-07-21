@@ -30,4 +30,14 @@
     <string name="card_number">Card Number</string>
     <string name="expiry_date_placeholder">MM/YY</string>
     <string name="cvv_place_holder">123</string>
+    <string name="order_history">Order History</string>
+    <string name="no_history">No history</string>
+    <string name="description">Description</string>
+    <string name="wishlist">Wishlist</string>
+    <string name="back">Back</string>
+    <string name="card_number_error">Card number cannot be empty</string>
+    <string name="expiry_date_error">Date cannot be empty</string>
+    <string name="cvv_error">CVV cannot be empty</string>
+    <string name="cvv_error_length">CVV cannot be less than 3 digits</string>
+    <string name="card_number_error_length">Card number cannot be less than 16 digits</string>
 </resources>

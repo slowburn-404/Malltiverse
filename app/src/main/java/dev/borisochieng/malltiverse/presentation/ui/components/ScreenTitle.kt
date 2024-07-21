@@ -2,9 +2,13 @@ package dev.borisochieng.malltiverse.presentation.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +31,9 @@ fun ScreenTitle(
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
             .padding(4.dp)
-            .background(MalltiverseTheme.colorScheme.background),
+            .fillMaxWidth()
+            .background(MalltiverseTheme.colorScheme.background)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
@@ -37,16 +41,17 @@ fun ScreenTitle(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .align(Alignment.CenterStart)
+                .padding(horizontal = 4.dp)
         )
 
         Text(
             text = title,
             style = typography.titleLarge,
             modifier = Modifier
-                .align(Alignment.Center)
-                .wrapContentWidth(
-                    align = Alignment.CenterHorizontally
-                ),
+                .align(Alignment.Center),
+//                .wrapContentWidth(
+//                    align = Alignment.CenterHorizontally
+//                ),
             textAlign = TextAlign.Center
         )
     }
