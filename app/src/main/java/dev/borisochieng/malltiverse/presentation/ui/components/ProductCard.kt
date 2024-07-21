@@ -4,15 +4,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,12 +46,13 @@ fun ProductCard(
     modifier: Modifier = Modifier,
     product: DomainProduct,
     onAddToCartClick: (DomainProduct) -> Unit,
+    onAddToWishlistClick: (DomainProduct) -> Unit
 ) {
     Card(
         modifier = modifier
             .padding(8.dp)
+            .height(IntrinsicSize.Min)
             .width(200.dp)
-            .fillMaxHeight()
             .clip(shape.card),
         shape = shape.card,
         colors = CardDefaults.cardColors(Color.Transparent),
@@ -58,30 +66,46 @@ fun ProductCard(
                     .fillMaxWidth()
                     .background(colorScheme.container)
                     .clip(shape.card)
-                    .height(180.dp),
+                    .height(150.dp),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
                     modifier = Modifier
-                        .padding(6.dp),
+                        .padding(6.dp)
+                        .size(100.dp),
                     model = ImageRequest
                         .Builder(LocalContext.current)
                         .data(product.imageURL)
                         .build(),
                     contentDescription = product.name,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
+
+                IconButton(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp),
+                    onClick = {
+                        onAddToWishlistClick(product)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Favorite,
+                        contentDescription = "Add to wishlist",
+                        tint = colorScheme.primary
+                    )
+                }
             }
 
             //product details
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .background(Color.Transparent)
             ) {
                 Text(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 4.dp, vertical = 4.dp)
                         .fillMaxWidth(),
                     text = product.name,
                     style = MalltiverseTheme.typography.body,
@@ -90,11 +114,11 @@ fun ProductCard(
                 )
 
                 Text(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                     text = product.description,
                     style = MalltiverseTheme.typography.bodySmall,
                     color = colorScheme.onBackground,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
@@ -102,25 +126,22 @@ fun ProductCard(
                     painter = painterResource(id = R.drawable.stars),
                     contentDescription = "Rating",
                     modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
                         .align(Alignment.Start)
                 )
 
                 Text(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
                     text = "₦ ${product.price}",
                     style = MalltiverseTheme.typography.bodySmall,
                     color = colorScheme.primary
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
-
                 AddToCartButton(
                     modifier = Modifier.padding(4.dp),
                     label = if (product.isAddedToCart) {
                         stringResource(id = R.string.remove_from_cart)
-                    }
-                    else {
+                    } else {
                         stringResource(id = R.string.add_to_cart)
                     },
                     onClick = {

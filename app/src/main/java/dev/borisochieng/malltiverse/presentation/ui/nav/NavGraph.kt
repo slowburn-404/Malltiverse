@@ -3,33 +3,44 @@ package dev.borisochieng.malltiverse.presentation.ui.nav
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import dev.borisochieng.malltiverse.presentation.MainActivityViewModel
-import dev.borisochieng.malltiverse.presentation.ui.screens.CartScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.cart.CartScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.CheckoutScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.HomeScreen
-import dev.borisochieng.malltiverse.presentation.ui.screens.OrderHistoryScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHistoryScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.PaymentScreen
 import dev.borisochieng.malltiverse.presentation.ui.screens.PaymentSuccessfulScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.ProductScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.WishlistScreen
+import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHistoryViewModel
 
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    viewModel: MainActivityViewModel,
-    snackBarHostState: SnackbarHostState
+    mainActivityViewModel: MainActivityViewModel,
+    snackBarHostState: SnackbarHostState,
+    orderHistoryViewModel: OrderHistoryViewModel
+
 ) {
+
     NavHost(
         navController = navController,
         startDestination = BottomNavItems.Home.route,
     ) {
         composable(route = BottomNavItems.Home.route) {
-            HomeScreen(viewModel = viewModel, snackBarHostState = snackBarHostState)
+            HomeScreen(
+                mainActivityViewModel = mainActivityViewModel,
+                snackBarHostState = snackBarHostState
+            )
         }
         composable(route = BottomNavItems.Cart.route) {
-            CartScreen(viewModel = viewModel, onCheckoutClick = {
+            CartScreen(viewModel = mainActivityViewModel, onCheckoutClick = {
                 navController.navigate(BottomNavItems.Checkout.route)
             })
         }
@@ -47,6 +58,7 @@ fun NavGraph(
         ) {
             composable(route = PaymentFlow.PaymentFlowScreens.paymentScreen.route) {
                 PaymentScreen(onMakePaymentClick = {
+                    mainActivityViewModel.addCartItemsToLocalDb()
                     navController.navigate(PaymentFlow.PaymentFlowScreens.paymentSuccessfulScreen.route)
                 })
             }
@@ -62,8 +74,35 @@ fun NavGraph(
                 })
             }
         }
-        composable(route = PaymentFlowNavItems.OrderHistory.route) {
-            OrderHistoryScreen()
+        composable(route = OtherNavItems.OrderHistory.route) {
+            OrderHistoryScreen(orderHistoryViewModel, snackBarHostState, onCardClick = { product ->
+                navController.navigate(OtherNavItems.Product.createRoute(product.id))
+            })
+        }
+
+        composable(
+            route = OtherNavItems.Product.route,
+            arguments = listOf(navArgument("productId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")
+            if (productId != null) {
+                ProductScreen(
+                    productID = productId,
+                    viewModel = mainActivityViewModel,
+                    snackBarHostState = snackBarHostState
+                )
+            }
+        }
+
+        composable(
+            route = OtherNavItems.Wishlist.route
+        ) {
+            WishlistScreen(
+                viewModel = mainActivityViewModel,
+                snackBarHostState = snackBarHostState,
+                onCardClick = { product ->
+                    navController.navigate(OtherNavItems.Product.createRoute(product.id))
+                })
         }
     }
 }

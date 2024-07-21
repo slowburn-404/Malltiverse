@@ -10,9 +10,7 @@ fun Order.toDomainOrder(): DomainOrder =
         id = id,
         name = name,
         description = description,
-        price = price,
-        imageUrl = imageUrl,
-        isAddedToCart = false
+        imageUrl = imageUrl
     )
 
 fun WishListItem.toDomainWishListItem(): DomainWishlistItem =
@@ -20,10 +18,5 @@ fun WishListItem.toDomainWishListItem(): DomainWishlistItem =
         id = id,
         name = name,
         description = description,
-        imageURL = imageURL,
-        price = price,
-        isAddedToCart = false,
-        quantity = quantity,
-        availableQuantity = availableQuantity,
-        isAddedToWishlist = isAddedToWishList
+        imageURL = imageURL
     )

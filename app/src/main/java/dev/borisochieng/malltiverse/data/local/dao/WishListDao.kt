@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WishListDao {
-    @Query("SELECT * FROM order_history")
+    @Query("SELECT * FROM wishlist")
     fun getWishList(): Flow<List<WishListItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

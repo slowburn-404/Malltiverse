@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp.kotlin)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.room)
 }
 
 fun getLocalProperty(key: String): String {
@@ -32,6 +33,10 @@ android {
         buildConfigField("String", "appID", "\"${getLocalProperty("appID")}\"")
         buildConfigField("String", "apiKey", "\"${getLocalProperty("apiKey")}\"")
         buildConfigField("String", "orgID", "\"${getLocalProperty("orgID")}\"")
+
+        room {
+            schemaDirectory(path = "$projectDir/schemas")
+        }
     }
 
     buildTypes {

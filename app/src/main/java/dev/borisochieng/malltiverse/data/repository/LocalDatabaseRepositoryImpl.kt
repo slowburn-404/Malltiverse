@@ -12,7 +12,9 @@ import dev.borisochieng.malltiverse.domain.models.DomainOrder
 import dev.borisochieng.malltiverse.domain.models.DomainWishlistItem
 import dev.borisochieng.malltiverse.util.CoroutineDispatcherProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class LocalDatabaseRepositoryImpl(
@@ -22,17 +24,16 @@ class LocalDatabaseRepositoryImpl(
 ) : LocalDatabaseRepository {
     override suspend fun getOrders(): Flow<DatabaseResponse<List<DomainOrder>>> = flow {
         try {
-            withContext(dispatcher.IO) {
-                orderHistoryDao.getAllOrders().collect { allOrders ->
-                    val domainOrders = allOrders.map { it.toDomainOrder() }
-                    emit(DatabaseResponse.Success(domainOrders))
-                }
+            orderHistoryDao.getAllOrders().collect { allOrders ->
+                val domainOrders = allOrders.map { it.toDomainOrder() }
+                emit(DatabaseResponse.Success(domainOrders))
             }
+
         } catch (e: Exception) {
             e.printStackTrace()
             emit(DatabaseResponse.Error(message = "Something went wrong please try again"))
         }
-    }
+    }.flowOn(dispatcher.IO)
 
     override suspend fun addOrder(order: Order): DatabaseResponse<Unit> =
         withContext(dispatcher.IO) {
@@ -56,20 +57,18 @@ class LocalDatabaseRepositoryImpl(
             }
         }
 
-    override suspend fun getWishlist(): Flow<DatabaseResponse<List<DomainWishlistItem>>> = flow {
-        try {
-            withContext(dispatcher.IO) {
+    override suspend fun getWishlist(): Flow<DatabaseResponse<List<DomainWishlistItem>>> =
+        flow {
+            try {
                 wishListDao.getWishList().collect { wishList ->
                     val domainWishlistProducts = wishList.map { it.toDomainWishListItem() }
                     emit(DatabaseResponse.Success(domainWishlistProducts))
-
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(DatabaseResponse.Error(message = "Something went wrong please try again"))
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emit(DatabaseResponse.Error(message = "Something went wrong please try again"))
-        }
-    }
+        }.flowOn(dispatcher.IO)
 
     override suspend fun removeFromWishlist(wishListItem: WishListItem) =
         withContext(dispatcher.IO) {

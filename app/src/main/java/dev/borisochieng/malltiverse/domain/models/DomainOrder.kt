@@ -7,7 +7,5 @@ data class DomainOrder(
     val id: String,
     val name: String,
     val description: String,
-    val price: Double,
-    val imageUrl: String,
-    val isAddedToCart: Boolean
+    val imageUrl: String
 )

@@ -1,6 +1,7 @@
 package dev.borisochieng.malltiverse.data.remote
 
 import dev.borisochieng.malltiverse.data.remote.models.CurrentPrice
+import dev.borisochieng.malltiverse.data.remote.models.Product
 import dev.borisochieng.malltiverse.data.remote.models.ProductResponse
 import dev.borisochieng.malltiverse.domain.models.DomainCategory
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
@@ -25,6 +26,24 @@ fun ProductResponse.toDomainProduct(): List<DomainProduct> =
             isAddedToWishlist = false
         )
     }
+
+fun Product.toDomainProduct(): DomainProduct =
+    DomainProduct(
+        id = uniqueId,
+        name = name,
+        description = description ?: "No description available",
+        price = extractPrice(currentPrice),
+        imageURL = "$BASE_IMAGE_URL{photos?.firstOrNull()?.url}",
+        category = categories?.map { category ->
+            DomainCategory(
+                name = category.name.capitalizeWords(),
+            )
+        } ?: emptyList(),
+        availableQuantity = availableQuantity?.toInt() ?: 0,
+        quantity = 1,
+        isAddedToCart = false,
+        isAddedToWishlist = false
+    )
 
 fun String.capitalizeWords(): String =
     split(" ")

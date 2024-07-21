@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.borisochieng.malltiverse.R
+import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.presentation.ui.components.PaymentCard
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.shape

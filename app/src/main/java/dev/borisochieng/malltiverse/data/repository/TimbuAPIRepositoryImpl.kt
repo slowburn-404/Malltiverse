@@ -53,4 +53,40 @@ class TimbuAPIRepositoryImpl(
                 NetworkResponse.Error("An unexpected error occurred. Please try again later.")
             }
         }
+
+    override suspend fun getProduct(
+        productID: String,
+        apiKey: String,
+        organizationID: String,
+        appID: String
+    ): NetworkResponse<DomainProduct> =
+        withContext(dispatcher.IO) {
+            try {
+                val response = apiService.getProduct(
+                    productID = productID,
+                    apiKey = apiKey,
+                    organizationID = organizationID,
+                    appID = appID
+                )
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    NetworkResponse.Success(body?.toDomainProduct())
+                } else {
+                    val errorMessage = when (response.code()) {
+                        400 -> "We encountered a problem with your request. Please try again."
+                        404 -> "The resource you're looking for couldn't be found. It might have been removed or is temporarily unavailable."
+                        500 -> "Something went wrong on our end. Please try again later."
+                        else -> "An unexpected error occurred. Please try again."
+                    }
+                    NetworkResponse.Error(errorMessage)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                NetworkResponse.Error("An unexpected error occurred. Please try again later.")
+            }
+        }
+
+
 }

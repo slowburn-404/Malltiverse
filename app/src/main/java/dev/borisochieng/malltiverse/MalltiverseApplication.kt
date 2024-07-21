@@ -6,6 +6,7 @@ import dev.borisochieng.malltiverse.data.repository.TimbuAPIRepositoryImpl
 import dev.borisochieng.malltiverse.data.remote.retrofit.RetrofitClient
 import dev.borisochieng.malltiverse.data.remote.service.TimbuAPIService
 import dev.borisochieng.malltiverse.data.repository.LocalDatabaseRepositoryImpl
+import dev.borisochieng.malltiverse.presentation.SharedViewModelFactory
 import dev.borisochieng.malltiverse.util.CoroutineDispatcherProvider
 
 class MalltiverseApplication : Application() {
@@ -34,6 +35,14 @@ class MalltiverseApplication : Application() {
             dispatcher = dispatcherProvider,
             orderHistoryDao = malltiverseDatabase.orderHistoryDao(),
             wishListDao = malltiverseDatabase.wishListDao()
+        )
+    }
+
+    val sharedViewModelFactory by lazy {
+        SharedViewModelFactory(
+            timbuAPIRepository = timbuAPIRepositoryImpl,
+            localDatabaseRepository = localDatabaseRepository,
+            dispatcher = dispatcherProvider
         )
     }
 

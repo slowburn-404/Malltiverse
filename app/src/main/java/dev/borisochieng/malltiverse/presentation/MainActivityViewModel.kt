@@ -2,11 +2,15 @@ package dev.borisochieng.malltiverse.presentation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dev.borisochieng.malltiverse.data.local.DatabaseResponse
 import dev.borisochieng.malltiverse.data.remote.NetworkResponse
+import dev.borisochieng.malltiverse.domain.LocalDatabaseRepository
 import dev.borisochieng.malltiverse.domain.TimbuAPIRepository
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
+import dev.borisochieng.malltiverse.domain.models.DomainWishlistItem
+import dev.borisochieng.malltiverse.domain.toOrder
+import dev.borisochieng.malltiverse.domain.toWishListItem
 import dev.borisochieng.malltiverse.util.Constants.API_KEY
 import dev.borisochieng.malltiverse.util.Constants.APP_ID
 import dev.borisochieng.malltiverse.util.Constants.ORGANIZATION_ID
@@ -25,6 +29,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivityViewModel(
     private val timbuAPIRepository: TimbuAPIRepository,
+    private val localDatabaseRepository: LocalDatabaseRepository,
     private val dispatcher: CoroutineDispatcherProvider
 ) : ViewModel() {
 
@@ -104,6 +109,53 @@ class MainActivityViewModel(
 
         }
 
+    fun getProduct(
+        productId: String,
+        apiKey: String,
+        organizationID: String,
+        appId: String
+    ) = viewModelScope.launch {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                errorMessage = ""
+            )
+        }
+        val productResponse = timbuAPIRepository.getProduct(
+            productID = productId,
+            apiKey = apiKey,
+            organizationID = organizationID,
+            appID = appId
+        )
+
+        when (productResponse) {
+            is NetworkResponse.Success -> {
+                val product = productResponse.payLoad
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        product = product
+                    )
+                }
+            }
+
+            is NetworkResponse.Error -> {
+                val errorMessage = productResponse.message
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = errorMessage
+                    )
+                }
+                _eventFlow.emit(
+                    UIEvents.SnackBarEvent(
+                        message = errorMessage
+                    )
+                )
+            }
+        }
+    }
+
     fun toggleCart(product: DomainProduct) = viewModelScope.launch {
         val updatedCategories = _uiState.value.categoriesWithProducts.mapValues { (_, products) ->
             products.map { p ->
@@ -160,22 +212,119 @@ class MainActivityViewModel(
     fun getTotalCartPrice(): Double =
         _uiState.value.cartItems.sumOf { it.price * it.quantity }
 
+    fun addCartItemsToLocalDb() =
+        viewModelScope.launch {
+            val cartItems = _uiState.value.cartItems
+            cartItems.forEach { item ->
+                localDatabaseRepository.addOrder(item.toOrder())
+            }
+        }
+
     private fun getCartItems(categories: Map<String, List<DomainProduct>>): List<DomainProduct> =
         categories.values.flatten().filter { it.isAddedToCart }
-}
 
+    fun addToWishList(product: DomainWishlistItem) =
+        viewModelScope.launch {
+            val isProductAlreadyInWishlist = localDatabaseRepository.addToWishList(product.toWishListItem())
 
-class MainActivityViewModelFactory(
-    private val timbuAPIRepository: TimbuAPIRepository,
-    private val dispatcher: CoroutineDispatcherProvider
-) :
-    ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            return MainActivityViewModel(timbuAPIRepository, dispatcher = dispatcher) as T
-        } else {
-            throw IllegalArgumentException("Unknown ViewModel class")
+            when(isProductAlreadyInWishlist) {
+                is DatabaseResponse.Success -> {
+                    val updatedWishlistItems = _uiState.value.categoriesWithProducts.mapValues { (_, products) ->
+                        products.map { p ->
+                            if (p.id == product.id) {
+                                p.copy(
+                                    isAddedToWishlist = !p.isAddedToWishlist,
+                                )
+                            } else {
+                                p
+                            }
+                        }
+                    }
+
+                    _uiState.update {
+                        it.copy(categoriesWithProducts = updatedWishlistItems)
+                    }
+
+                    _eventFlow.emit(
+                        UIEvents.SnackBarEvent(
+                            message = "Product added to wishlist"
+                        )
+                    )
+                }
+                is DatabaseResponse.Error -> {
+                    _eventFlow.emit(
+                        UIEvents.SnackBarEvent(
+                            message = isProductAlreadyInWishlist.message
+                        )
+                    )
+                }
+            }
         }
-    }
+
+    fun getWishlist() =
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = ""
+                )
+            }
+
+            val wishlist = localDatabaseRepository.getWishlist()
+
+            wishlist.collect { wishListResponse ->
+                when (wishListResponse) {
+                    is DatabaseResponse.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            wishlist = wishListResponse.items ?: emptyList()
+                        )
+                        _eventFlow.emit(
+                            UIEvents.SnackBarEvent(
+                                message = "Product added to wishlist"
+                            )
+                        )
+                    }
+
+                    is DatabaseResponse.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = wishListResponse.message
+                            )
+                        }
+
+                        _eventFlow.emit(
+                            UIEvents.SnackBarEvent(
+                                message = wishListResponse.message
+                            )
+                        )
+
+                    }
+                }
+
+            }
+        }
+
+    fun removeFromWishList(product: DomainWishlistItem) =
+        viewModelScope.launch {
+            val isProductInWishlist = localDatabaseRepository.removeFromWishlist(product.toWishListItem())
+
+            when(isProductInWishlist) {
+                is DatabaseResponse.Success -> {
+                    _eventFlow.emit(
+                        UIEvents.SnackBarEvent(
+                            message = "Removed from wishlist"
+                        )
+                    )
+                }
+                is DatabaseResponse.Error -> {
+                    _eventFlow.emit(
+                        UIEvents.SnackBarEvent(
+                            message = isProductInWishlist.message
+                        )
+                    )
+                }
+            }
+        }
 }

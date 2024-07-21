@@ -55,7 +55,6 @@ fun CartItem(
 
     Card(
         modifier = modifier
-            .height(150.dp)
             .padding(8.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(Color.Transparent),
@@ -84,7 +83,9 @@ fun CartItem(
                     modifier = Modifier
                         .padding(8.dp)
                 ) {
-                    Column {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text(
                             modifier = Modifier
                                 .padding(4.dp),
@@ -102,9 +103,6 @@ fun CartItem(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
                     Button(
                         modifier = Modifier
                             .size(24.dp)
@@ -185,9 +183,7 @@ fun CartItem(
                             contentDescription = "Add quantity"
                         )
                     }
-
                     Spacer(modifier = Modifier.weight(1f))
-
                     Text(
                         modifier = Modifier
                             .padding(4.dp)
@@ -216,7 +212,8 @@ fun CardItemPreview() {
         category = emptyList(),
         availableQuantity = 15,
         quantity = 1,
-        isAddedToCart = false
+        isAddedToCart = false,
+        isAddedToWishlist = false
     )
     CartItem(
         product = fakeProduct,

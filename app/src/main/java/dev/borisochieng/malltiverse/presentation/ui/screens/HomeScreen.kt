@@ -21,17 +21,16 @@ import androidx.compose.ui.unit.dp
 import dev.borisochieng.malltiverse.presentation.MainActivityViewModel
 import dev.borisochieng.malltiverse.presentation.ui.components.FeaturedCard
 import dev.borisochieng.malltiverse.presentation.ui.components.LazyRowWithScrollIndicator
+import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHistoryViewModel
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.colorScheme
 import dev.borisochieng.malltiverse.util.UIEvents
 
 @Composable
 fun HomeScreen(
-    viewModel: MainActivityViewModel,
+    mainActivityViewModel: MainActivityViewModel,
     snackBarHostState: SnackbarHostState
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val categories = uiState.categoriesWithProducts
-    val lazyColumnState = rememberLazyListState()
+    val uiState by mainActivityViewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -50,6 +49,8 @@ fun HomeScreen(
                 )
             }
         } else {
+            val categories = uiState.categoriesWithProducts
+            val lazyColumnState = rememberLazyListState()
             LazyColumn(
                 state = lazyColumnState,
                 contentPadding = PaddingValues(vertical = 8.dp)
@@ -62,7 +63,10 @@ fun HomeScreen(
                     LazyRowWithScrollIndicator(
                         categoryName = categoryName,
                         products = categories[categoryName] ?: emptyList(),
-                        viewModel = viewModel
+                        viewModel = mainActivityViewModel,
+                        onAddToWishlistClick = {
+                            mainActivityViewModel.addToWishList(it)
+                        }
                     )
                 }
             }
@@ -71,7 +75,7 @@ fun HomeScreen(
 
         if (uiState.errorMessage.isNotEmpty()) {
             LaunchedEffect(Unit) {
-                viewModel.eventFlow.collect{ event->
+                mainActivityViewModel.eventFlow.collect{ event->
                     when(event) {
                         is UIEvents.SnackBarEvent -> {
                             snackBarHostState.showSnackbar(event.message)

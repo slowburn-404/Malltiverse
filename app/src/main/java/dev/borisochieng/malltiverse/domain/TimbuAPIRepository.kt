@@ -15,4 +15,11 @@ interface TimbuAPIRepository {
         appID: String
     ): NetworkResponse<List<DomainProduct>>
 
+    suspend fun getProduct(
+        productID: String,
+        apiKey: String,
+        organizationID: String,
+        appID: String
+    ): NetworkResponse<DomainProduct>
+
 }
