@@ -1,15 +1,20 @@
 ## Malltiverse
-A simple Android application that consumes the [Timbu API](https://docs.timbu.cloud/api/intro) and displays the response in a list.
+An E-Commerce Android application that consumes the [Timbu API](https://docs.timbu.cloud/api/intro) and displays the response in a list.
 
 ## Wireframes
 - [Figma](https://www.figma.com/design/QHq9WbFOHgdDRhPuLOTNvB/HNG-INTERNSHIP?node-id=142-292&t=LGp1Sxxln6UcvMQn-0)
 
 ## Demo
-- [Appetize](https://appetize.io/app/b_j6wju4c2hsenfvoin7ebbnfide)
-- Go to releases for the [APK](https://github.com/slowburn-404/HNGInternship/releases/tag/v1.0.1(Malltiverse))
+- [Appetize](https://appetize.io/app/b_x3fxa7wmnkbdncksn6ly7lteuq)
+- Go to releases for the [APK](https://github.com/slowburn-404/Malltiverse/releases/tag/v1.0.1)
 
 ## Features
 - List products by category.
+- Favourite/ add to wishlist.
+- Add/remove products to/from carts.
+- Local data persistence of wishlist.
+- Input validation.
+- Save completed orders locally
 
 ## Architecture Overview
 - The application utilizes the Model-View-ViewModel (MVVM) architecture pattern. The Model ([Data layer](app/src/main/java/dev/borisochieng/malltiverse/data/)) is responsible for data retrieval from the API and uses the repository pattern.
@@ -24,12 +29,20 @@ A simple Android application that consumes the [Timbu API](https://docs.timbu.cl
 - **[Coil](https://coil-kt.github.io/coil/)**: A lightweight image loading library.
 - **[Coroutines](https://developer.android.com/kotlin/coroutines#:~:text=A%20coroutine%20is%20a%20concurrency,established%20concepts%20from%20other%20languages)**: A concurrency design pattern in Kotlin used to make asynchronous network calls (on a background thread).
 - **[Gson](https://github.com/google/gson)**: A library used to convert Kotlin objects to and from JSON (serialization and deserialization).
-- **[OkHttp](https://square.github.io/okhttp/)**: An HTTP client library for Android and Java applications used to make network requests.
+- **[OkHttp](https://square.github.io/okhttp/)**: A HTTP client library for Android and Java applications used to make network requests.
 - **[OkHttp Logging Interceptor](https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor)**: Used for logging HTTP request and response data.
 - **[ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel)**: A lifecycle-aware Android Architecture Component for holding state.
+- **[Room Persistence Library](https://developer.android.com/training/data-storage/room)**: Android Jetpack Library for local data caching.
 
 ## Screenshots
-![Malltiverse](screenshots/malltiverse.png)
+![Products' List](screenshots/product_list.png)
+![Cart](screenshots/cart.png)
+![Checkout](screenshots/checkout.png)
+![Payment](screenshots/payment_screen.png)
+![Payment Complete](screenshots/payment_sucessfull.png)
+![Order history](screenshots/orders.png)
+![Single Order](screenshots/single_order.png)
+![Wishlist](screenshots/wishlist.png)
 
 ## Setup Instructions
 
@@ -61,4 +74,4 @@ appID=YOUR_APP_ID
 - Click on the `Run` button or use `Shift + F10`.
 
 ## License
-This project is licensed under the Apache-2.0 License. See the [LICENSE](../LICENSE) file for more details.
+This project is licensed under the Apache-2.0 License. See the [LICENSE](./LICENSE) file for more details.
