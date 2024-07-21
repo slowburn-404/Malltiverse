@@ -14,8 +14,8 @@ sealed class OtherNavItems(
     )
 
     data object OrderHistory : OtherNavItems(
-        route = "order_history",
-        title = "Order History"
+        route = "orders",
+        title = "Orders"
     )
 
     data object Product: OtherNavItems(

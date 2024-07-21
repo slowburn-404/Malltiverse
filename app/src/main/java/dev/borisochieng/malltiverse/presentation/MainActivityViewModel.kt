@@ -23,9 +23,11 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 class MainActivityViewModel(
     private val timbuAPIRepository: TimbuAPIRepository,
@@ -38,6 +40,8 @@ class MainActivityViewModel(
 
     private val _eventFlow = MutableSharedFlow<UIEvents>()
     val eventFlow: SharedFlow<UIEvents> get() = _eventFlow.asSharedFlow()
+
+    private var cartItemsCache = listOf<DomainProduct>()
 
     init {
         getProducts(
@@ -52,15 +56,15 @@ class MainActivityViewModel(
         apiKey: String,
         organizationID: String,
         appId: String
-    ) =
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isLoading = true,
-                    errorMessage = ""
-                )
-            }
+    ) = viewModelScope.launch {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                errorMessage = ""
+            )
+        }
 
+        withTimeoutOrNull(5000L) { // Timeout after 5 seconds
             val productsResponse = timbuAPIRepository.getProducts(
                 organizationID = organizationID,
                 appID = appId,
@@ -70,15 +74,23 @@ class MainActivityViewModel(
             when (productsResponse) {
                 is NetworkResponse.Success -> {
                     val allProducts = productsResponse.payLoad ?: emptyList()
+                    if (allProducts.isEmpty()) {
+                        // Handle empty product list scenario
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false, errorMessage = "No products found"
+                            )
+                        }
+                        _eventFlow.emit(UIEvents.SnackBarEvent(message = "No products found"))
+                    } else {
+                        withContext(dispatcher.Default) {
+                            val wishlist = localDatabaseRepository.getWishlist().first()
+                            val groupedProductsByCategory = allProducts.flatMap { product ->
+                                product.category.map { category ->
+                                    category.name to product
+                                }
+                            }.groupBy({ it.first }, { it.second })
 
-                    withContext(dispatcher.Default) {
-                        val groupedProductsByCategory = allProducts.flatMap { product ->
-                            product.category.map { category ->
-                                category.name to product
-                            }
-                        }.groupBy({ it.first }, { it.second })
-
-                        withContext(dispatcher.Main) {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
@@ -97,17 +109,19 @@ class MainActivityViewModel(
                             errorMessage = productsResponse.message
                         )
                     }
-
-                    _eventFlow.emit(
-                        UIEvents.SnackBarEvent(
-                            message = productsResponse.message
-                        )
-                    )
+                    _eventFlow.emit(UIEvents.SnackBarEvent(message = productsResponse.message))
                 }
             }
-
-
+        } ?: run {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = "Network timeout"
+                )
+            }
+            _eventFlow.emit(UIEvents.SnackBarEvent(message = "Network timeout"))
         }
+    }
 
     fun getProduct(
         productId: String,
@@ -167,8 +181,8 @@ class MainActivityViewModel(
                 } else {
                     p
                 }
-            }
-        }
+            }.toList()
+        }.toMutableMap()
 
         _uiState.update {
             it.copy(categoriesWithProducts = updatedCategories)
@@ -179,8 +193,6 @@ class MainActivityViewModel(
         _uiState.update {
             it.copy(cartItems = updatedCartItems)
         }
-
-        Log.d("Toggle Cart", "toggleCart: ${product.name} ${product.isAddedToCart}")
     }
 
     fun updateQuantity(product: DomainProduct, newQuantity: Int) =
@@ -190,14 +202,14 @@ class MainActivityViewModel(
                     products.map {
                         if (it.id == product.id) {
                             it.copy(
-                                quantity = newQuantity,
-                                price = newQuantity * it.price
+                                quantity = newQuantity
+                                //price = newQuantity * it.price
                             )
                         } else {
                             it
                         }
-                    }
-                }
+                    }.toList()
+                }.toMutableMap()
 
             _uiState.update {
                 it.copy(categoriesWithProducts = updatedCartItems)
@@ -220,43 +232,87 @@ class MainActivityViewModel(
             }
         }
 
-    private fun getCartItems(categories: Map<String, List<DomainProduct>>): List<DomainProduct> =
-        categories.values.flatten().filter { it.isAddedToCart }
-
-    fun addToWishList(product: DomainWishlistItem) =
+    fun clearCart() =
         viewModelScope.launch {
-            val isProductAlreadyInWishlist = localDatabaseRepository.addToWishList(product.toWishListItem())
+            _uiState.update {
+                it.copy(
+                    cartItems = emptyList()
+                )
+            }
+        }
 
-            when(isProductAlreadyInWishlist) {
-                is DatabaseResponse.Success -> {
-                    val updatedWishlistItems = _uiState.value.categoriesWithProducts.mapValues { (_, products) ->
-                        products.map { p ->
-                            if (p.id == product.id) {
-                                p.copy(
-                                    isAddedToWishlist = !p.isAddedToWishlist,
-                                )
-                            } else {
-                                p
+    private fun getCartItems(categories: Map<String, List<DomainProduct>>): List<DomainProduct> =
+        cartItemsCache.ifEmpty {
+            categories.values.flatten().filter { it.isAddedToCart }
+        }
+
+    fun toggleWishlist(product: DomainWishlistItem) =
+        viewModelScope.launch {
+            // Check if the product is already in the wishlist
+            val isProductAlreadyInWishlist = _uiState.value.wishlist.any { it.id == product.id }
+
+            if (isProductAlreadyInWishlist) {
+                // If the product is in the wishlist, remove it
+                val result = localDatabaseRepository.removeFromWishlist(product.toWishListItem())
+
+                when (result) {
+                    is DatabaseResponse.Success -> {
+                        // Update the UI state to reflect the product has been removed from the wishlist
+                        val updatedCategories =
+                            _uiState.value.categoriesWithProducts.mapValues { (_, products) ->
+                                products.map { p ->
+                                    if (p.id == product.id) {
+                                        p.copy(isAddedToWishlist = false) // Set to false after removing
+                                    } else {
+                                        p
+                                    }
+                                }
                             }
+                        val updatedWishlist = _uiState.value.wishlist.toMutableList()
+                        updatedWishlist.removeIf { it.id == product.id }
+
+                        _uiState.update {
+                            it.copy(
+                                categoriesWithProducts = updatedCategories,
+                                wishlist = updatedWishlist
+                            )
                         }
                     }
 
-                    _uiState.update {
-                        it.copy(categoriesWithProducts = updatedWishlistItems)
+                    is DatabaseResponse.Error -> {
+                        _eventFlow.emit(UIEvents.SnackBarEvent(message = result.message))
+                    }
+                }
+            } else {
+                // If the product is not in the wishlist, add it
+                val result = localDatabaseRepository.addToWishList(product.toWishListItem())
+
+                when (result) {
+                    is DatabaseResponse.Success -> {
+                        // Update the UI state to reflect the product has been added to the wishlist
+                        val updatedCategories =
+                            _uiState.value.categoriesWithProducts.mapValues { (_, products) ->
+                                products.map { p ->
+                                    if (p.id == product.id) {
+                                        p.copy(isAddedToWishlist = true) // Set to true after adding
+                                    } else {
+                                        p
+                                    }
+                                }
+                            }
+                        val updatedWishlist = _uiState.value.wishlist.toMutableList()
+
+                        _uiState.update {
+                            it.copy(
+                                categoriesWithProducts = updatedCategories,
+                                wishlist = updatedWishlist
+                            )
+                        }
                     }
 
-                    _eventFlow.emit(
-                        UIEvents.SnackBarEvent(
-                            message = "Product added to wishlist"
-                        )
-                    )
-                }
-                is DatabaseResponse.Error -> {
-                    _eventFlow.emit(
-                        UIEvents.SnackBarEvent(
-                            message = isProductAlreadyInWishlist.message
-                        )
-                    )
+                    is DatabaseResponse.Error -> {
+                        _eventFlow.emit(UIEvents.SnackBarEvent(message = result.message))
+                    }
                 }
             }
         }
@@ -275,15 +331,28 @@ class MainActivityViewModel(
             wishlist.collect { wishListResponse ->
                 when (wishListResponse) {
                     is DatabaseResponse.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            wishlist = wishListResponse.items ?: emptyList()
-                        )
-                        _eventFlow.emit(
-                            UIEvents.SnackBarEvent(
-                                message = "Product added to wishlist"
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = ""
                             )
-                        )
+                        }
+                        val updatedCategories =
+                            _uiState.value.categoriesWithProducts.mapValues { (_, products) ->
+                                products.map { p ->
+                                    if (wishListResponse.items?.any { it.id == p.id } == true) {
+                                        p.copy(isAddedToWishlist = true)
+                                    } else {
+                                        p
+                                    }
+                                }
+                            }
+
+                        Log.d("Wishlist", wishListResponse.items.toString())
+
+                        _uiState.update {
+                            it.copy(categoriesWithProducts = updatedCategories, wishlist = wishListResponse.items ?: emptyList())
+                        }
                     }
 
                     is DatabaseResponse.Error -> {
@@ -308,16 +377,21 @@ class MainActivityViewModel(
 
     fun removeFromWishList(product: DomainWishlistItem) =
         viewModelScope.launch {
-            val isProductInWishlist = localDatabaseRepository.removeFromWishlist(product.toWishListItem())
+            val isProductInWishlist =
+                localDatabaseRepository.removeFromWishlist(product.toWishListItem())
 
-            when(isProductInWishlist) {
+            when (isProductInWishlist) {
                 is DatabaseResponse.Success -> {
-                    _eventFlow.emit(
-                        UIEvents.SnackBarEvent(
-                            message = "Removed from wishlist"
-                        )
-                    )
+                    val updatedWishlist = _uiState.value.wishlist.toMutableList()
+                    updatedWishlist.removeIf {
+                        it.id == product.id
+                    }
+
+                    _uiState.update {
+                        it.copy(wishlist = updatedWishlist)
+                    }
                 }
+
                 is DatabaseResponse.Error -> {
                     _eventFlow.emit(
                         UIEvents.SnackBarEvent(

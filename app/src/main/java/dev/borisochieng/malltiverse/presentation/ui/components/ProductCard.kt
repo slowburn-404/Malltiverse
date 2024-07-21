@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -90,7 +91,7 @@ fun ProductCard(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Favorite,
+                        imageVector = if (product.isAddedToWishlist) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                         contentDescription = "Add to wishlist",
                         tint = colorScheme.primary
                     )

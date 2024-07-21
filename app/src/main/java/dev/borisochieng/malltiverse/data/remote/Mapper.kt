@@ -29,7 +29,7 @@ fun ProductResponse.toDomainProduct(): List<DomainProduct> =
 
 fun Product.toDomainProduct(): DomainProduct =
     DomainProduct(
-        id = uniqueId,
+        id = id,
         name = name,
         description = description ?: "No description available",
         price = extractPrice(currentPrice),

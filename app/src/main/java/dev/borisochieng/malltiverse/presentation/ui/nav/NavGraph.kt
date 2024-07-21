@@ -59,6 +59,7 @@ fun NavGraph(
             composable(route = PaymentFlow.PaymentFlowScreens.paymentScreen.route) {
                 PaymentScreen(onMakePaymentClick = {
                     mainActivityViewModel.addCartItemsToLocalDb()
+                    mainActivityViewModel.clearCart()
                     navController.navigate(PaymentFlow.PaymentFlowScreens.paymentSuccessfulScreen.route)
                 })
             }

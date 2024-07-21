@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -85,7 +88,9 @@ class MainActivity : ComponentActivity() {
             val otherNavItems = listOf(
                 OtherNavItems.Payment,
                 OtherNavItems.PaymentComplete,
-                OtherNavItems.OrderHistory
+                OtherNavItems.OrderHistory,
+                OtherNavItems.Wishlist,
+                OtherNavItems.Product
             )
 
             val navCurrentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -173,6 +178,18 @@ class MainActivity : ComponentActivity() {
                                     )
 
                         }
+                            },
+                            navigationIcon = {
+                                if(otherNavItems.contains(currentScreen)) {
+                                    IconButton(onClick = {
+                                        navController.navigateUp()
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                            contentDescription = stringResource(R.string.back)
+                                        )
+                                    }
+                                }
                             }
                         )
                     },

@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import dev.borisochieng.malltiverse.presentation.MainActivityViewModel
 import dev.borisochieng.malltiverse.presentation.ui.components.FeaturedCard
 import dev.borisochieng.malltiverse.presentation.ui.components.LazyRowWithScrollIndicator
-import dev.borisochieng.malltiverse.presentation.ui.screens.orderhistory.OrderHistoryViewModel
 import dev.borisochieng.malltiverse.presentation.ui.theme.MalltiverseTheme.colorScheme
 import dev.borisochieng.malltiverse.util.UIEvents
 
@@ -65,7 +64,7 @@ fun HomeScreen(
                         products = categories[categoryName] ?: emptyList(),
                         viewModel = mainActivityViewModel,
                         onAddToWishlistClick = {
-                            mainActivityViewModel.addToWishList(it)
+                            mainActivityViewModel.toggleWishlist(it)
                         }
                     )
                 }

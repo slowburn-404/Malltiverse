@@ -34,4 +34,5 @@
     <string name="no_history">No history</string>
     <string name="description">Description</string>
     <string name="wishlist">Wishlist</string>
+    <string name="back">Back</string>
 </resources>

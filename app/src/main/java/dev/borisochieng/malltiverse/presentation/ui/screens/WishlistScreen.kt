@@ -13,11 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.borisochieng.malltiverse.R
+import dev.borisochieng.malltiverse.data.local.entities.WishListItem
 import dev.borisochieng.malltiverse.domain.models.DomainWishlistItem
 import dev.borisochieng.malltiverse.presentation.MainActivityViewModel
 import dev.borisochieng.malltiverse.presentation.ui.components.WishlistItemCard
@@ -30,14 +34,23 @@ fun WishlistScreen(
     onCardClick: (DomainWishlistItem) -> Unit,
     snackBarHostState: SnackbarHostState
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     LaunchedEffect(Unit) {
         viewModel.getWishlist()
     }
 
+    val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.orderHistory.isNotEmpty()) {
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            if (event is UIEvents.SnackBarEvent) {
+                snackBarHostState.showSnackbar(event.message)
+            }
+        }
+
+    }
+
+
+    if (uiState.wishlist.isNotEmpty()) {
         val wishlist = uiState.wishlist
         val lazyListState = rememberLazyListState()
 
@@ -72,17 +85,6 @@ fun WishlistScreen(
                     .padding(8.dp),
                 style = MalltiverseTheme.typography.bodyLarge
             )
-        }
-    }
-
-    if (uiState.errorMessage.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            viewModel.eventFlow.collect { event ->
-                if (event is UIEvents.SnackBarEvent) {
-                    snackBarHostState.showSnackbar(event.message)
-                }
-            }
-
         }
     }
 }
