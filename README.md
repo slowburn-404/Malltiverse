@@ -5,7 +5,7 @@ An E-Commerce Android application that consumes the [Timbu API](https://docs.tim
 - [Figma](https://www.figma.com/design/QHq9WbFOHgdDRhPuLOTNvB/HNG-INTERNSHIP?node-id=142-292&t=LGp1Sxxln6UcvMQn-0)
 
 ## Demo
-- [Appetize](https://appetize.io/app/b_x3fxa7wmnkbdncksn6ly7lteuq)
+- [Appetize](https://appetize.io/app/b_tsatn2vrgbsrvo7avhymsvujni)
 - Go to releases for the [APK](https://github.com/slowburn-404/Malltiverse/releases/tag/v1.0.1)
 
 ## Features
