@@ -17,11 +17,11 @@ An E-Commerce Android application that consumes the [Timbu API](https://docs.tim
 - Simulated payment flow.
 
 ## Architecture Overview
-- The application utilizes the Model-View-ViewModel (MVVM) architecture pattern. The Model ([Data layer](app/src/main/java/dev/borisochieng/malltiverse/data/)) is responsible for data retrieval from the API and SQLite Database and uses the repository pattern. It uses mappers to transform data layer objects to domain layer objects.
-- The [Domain](app/src/main/java/dev/borisochieng/malltiverse/domain/) contains objects used it the Presentation layer. It also uses mapper to transform the objects to data layer objects.
+- The application utilizes the Model-View-ViewModel (MVVM) architecture pattern. The Model ([Data layer](app/src/main/java/dev/borisochieng/malltiverse/data/)) is responsible for data retrieval from the API and SQLite Database and uses the repository pattern. It uses a mapper to transform data layer objects to domain layer objects.
+- The [Domain](app/src/main/java/dev/borisochieng/malltiverse/domain/) contains objects used it the Presentation layer. It also uses a mapper to transform the objects to data layer objects.
 - The [Presentation layer](app/src/main/java/dev/borisochieng/malltiverse/presentation/) wraps the View, which consists of [Activities](https://developer.android.com/guide/components/activities/intro-activities) made up of UI elements called Composables, and the ViewModel, holds the state for the screen (View) and data retrieved from the Model.
 
-<div style="text-align: center;">
+<div style="align: center;">
     <img src="./screenshots/mvvm.webp" alt="MVVM Architecture">
 </div>
 

@@ -1,18 +1,11 @@
 package dev.borisochieng.malltiverse.data.repository
 
-import dev.borisochieng.malltiverse.data.local.DatabaseResponse
-import dev.borisochieng.malltiverse.data.local.dao.OrderHistoryDao
-import dev.borisochieng.malltiverse.data.local.dao.WishListDao
-import dev.borisochieng.malltiverse.data.local.entities.Order
-import dev.borisochieng.malltiverse.data.local.entities.WishListItem
 import dev.borisochieng.malltiverse.data.remote.NetworkResponse
 import dev.borisochieng.malltiverse.data.remote.service.TimbuAPIService
 import dev.borisochieng.malltiverse.data.remote.toDomainProduct
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.domain.TimbuAPIRepository
-import dev.borisochieng.malltiverse.domain.models.DomainOrder
 import dev.borisochieng.malltiverse.util.CoroutineDispatcherProvider
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class TimbuAPIRepositoryImpl(
