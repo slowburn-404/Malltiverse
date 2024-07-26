@@ -3,6 +3,7 @@ package dev.borisochieng.malltiverse.data.remote
 import dev.borisochieng.malltiverse.data.remote.models.CurrentPrice
 import dev.borisochieng.malltiverse.data.remote.models.Product
 import dev.borisochieng.malltiverse.data.remote.models.ProductResponse
+import dev.borisochieng.malltiverse.data.remote.models.SingleProduct
 import dev.borisochieng.malltiverse.domain.models.DomainCategory
 import dev.borisochieng.malltiverse.domain.models.DomainProduct
 import dev.borisochieng.malltiverse.util.Constants.BASE_IMAGE_URL
@@ -27,13 +28,13 @@ fun ProductResponse.toDomainProduct(): List<DomainProduct> =
         )
     }
 
-fun Product.toDomainProduct(): DomainProduct =
+fun SingleProduct.toDomainProduct(): DomainProduct =
     DomainProduct(
         id = id,
         name = name,
         description = description ?: "No description available",
-        price = extractPrice(currentPrice),
-        imageURL = "$BASE_IMAGE_URL{photos?.firstOrNull()?.url}",
+        price = currentPrice,
+        imageURL = "$BASE_IMAGE_URL${photos.firstOrNull()?.url}",
         category = categories?.map { category ->
             DomainCategory(
                 name = category.name.capitalizeWords(),
